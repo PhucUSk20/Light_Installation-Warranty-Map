@@ -366,18 +366,6 @@ public class MainActivity extends AppCompatActivity {
                     RouteOptions.Builder builder = RouteOptions.builder();
                     Point origin = Point.fromLngLat(Objects.requireNonNull(location).getLongitude(), location.getLatitude());
 
-                    // Tính khoảng cách giữa origin và destination
-                    double distance = TurfMeasurement.distance(origin, destination);
-
-                    // Kiểm tra nếu khoảng cách vượt quá giới hạn (ví dụ: 5000 km)
-                    double maxDistance = 5000.0; // Bạn có thể điều chỉnh giới hạn này nếu cần
-                    if (distance > maxDistance) {
-                        Toast.makeText(MainActivity.this, "Destination is too far. Please choose a closer point.", Toast.LENGTH_SHORT).show();
-                        setRoute.setEnabled(true);
-                        setRoute.setText("Set route");
-                        return;
-                    }
-
                     builder.coordinatesList(Arrays.asList(origin, destination));
                     builder.alternatives(false);
                     builder.profile(DirectionsCriteria.PROFILE_DRIVING_TRAFFIC);
@@ -414,8 +402,8 @@ public class MainActivity extends AppCompatActivity {
             // Xử lý khi latA hoặc longB là null
             Log.e("MainActivity", "latA or longB is null");
         }
-
     }
+
 
 
 

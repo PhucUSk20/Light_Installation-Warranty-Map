@@ -85,6 +85,6 @@ public class LightData {
     }
     @Override
     public String toString() {
-        return lightname; // Return the lightName when toString() is called
+        return lightname;
     }
 }

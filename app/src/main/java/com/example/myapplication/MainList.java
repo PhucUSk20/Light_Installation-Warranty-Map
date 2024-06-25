@@ -112,7 +112,6 @@ public class MainList extends AppCompatActivity {
         RadioButton radioButtonOption1 = dialogView.findViewById(R.id.radioButtonOption1);
         RadioButton radioButtonOption2 = dialogView.findViewById(R.id.radioButtonOption2);
 
-        // Set listener for radio group to toggle visibility of spinner and edit text
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.radioButtonOption1) {
                 spinnerKhuvuc.setVisibility(View.VISIBLE);
@@ -129,7 +128,6 @@ public class MainList extends AppCompatActivity {
             }
         });
 
-        // Set up spinner with data from listGroupTitles
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, listGroupTitles);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerKhuvuc.setAdapter(spinnerAdapter);
@@ -147,18 +145,14 @@ public class MainList extends AppCompatActivity {
                         return;
                     }
 
-                    // Check which option is selected
                     int selectedRadioButtonId = radioGroup.getCheckedRadioButtonId();
                     if (selectedRadioButtonId == R.id.radioButtonOption1) {
-                        // Option 1 selected
                         if (spinnerKhuvuc.getSelectedItem() != null) {
                             khuVuc = spinnerKhuvuc.getSelectedItem().toString();
                             lightName = generateLightNameForOption1(khuVuc);
-                          //  createNewLight(khuVuc, lightName, location);
                             queryKhuVucNames( khuVuc,  lightName,  location);
                         }
                     } else if (selectedRadioButtonId == R.id.radioButtonOption2) {
-                        // Option 2 selected
                         khuVuc = editTextNewKhuvuc.getText().toString().trim();
                         if (!khuVuc.isEmpty()) {
                             lightName = generateLightNameForOption2(khuVuc);
@@ -170,15 +164,12 @@ public class MainList extends AppCompatActivity {
                         Toast.makeText(this, "Không thể tạo tên đèn. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
                         return;
                     }
-
-                    // Update textViewLightName one more time if needed
                     textViewLightName.setText("Tên đèn: " + lightName);
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
     }
     private void queryKhuVucNames(String khuVuc, String lightName, String location) {
-        // Thực hiện truy vấn dữ liệu từ node "Location" để lấy tên hiển thị của khu vực
         FirebaseDatabase.getInstance().getReference("Location")
                 .orderByValue()
                 .equalTo(khuVuc)
@@ -186,14 +177,12 @@ public class MainList extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
-                            // Lặp qua các kết quả trả về (chỉ nên có một kết quả duy nhất trong trường hợp này)
                             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                String key = snapshot.getKey(); // Lấy key của khu vực
-                                createNewLight(key, lightName, location); // Gọi hàm tạo mới đèn đường
-                                return; // Thoát sau khi tìm thấy kết quả
+                                String key = snapshot.getKey();
+                                createNewLight(key, lightName, location);
+                                return;
                             }
                         } else {
-                            // Xử lý trường hợp không tìm thấy khu vực
                             Toast.makeText(MainList.this, "Không tìm thấy khu vực trong Location", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -231,7 +220,6 @@ public class MainList extends AppCompatActivity {
     }
 
     private void createNewKhuvucInLocation(String displayName, String location) {
-        // Find the next available KhuvucN key based on existing data
         FirebaseDatabase.getInstance().getReference("Location").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -250,8 +238,6 @@ public class MainList extends AppCompatActivity {
                     }
                 }
                 String newKhuvucName = "Khuvuc" + (maxNumber + 1);
-
-                // Create new khu vực in "Location"
                 FirebaseDatabase.getInstance().getReference("Location")
                         .child(newKhuvucName)
                         .setValue(displayName)
@@ -259,15 +245,11 @@ public class MainList extends AppCompatActivity {
                             Toast.makeText(MainList.this, "Khuvuc created successfully", Toast.LENGTH_SHORT).show();
                             initializeData();
                             listAdapter = new MyExpandableListAdapter(getApplicationContext());
-
-                            // Set data to the adapter here
                             listAdapter.setData(listGroupTitles, listData);
 
                             expandableListView.setAdapter(listAdapter);
                         })
                         .addOnFailureListener(e -> Toast.makeText(MainList.this, "Failed to create khuvuc", Toast.LENGTH_SHORT).show());
-
-                // Create corresponding light in "LightStreet"
                 FirebaseDatabase.getInstance().getReference("LightStreet")
                         .child(newKhuvucName)
                         .child("Light1")

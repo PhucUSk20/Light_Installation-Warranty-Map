@@ -68,6 +68,21 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
         }
         TextView textView = convertView.findViewById(android.R.id.text1);
         textView.setText(groupTitle);
+        boolean hasError = false;
+        List<LightData> children = listData.get(listGroupTitles.get(groupPosition));
+        if (children != null) {
+            for (LightData child : children) {
+                if (child.getError() > 0) {
+                    hasError = true;
+                    break;
+                }
+            }
+        }
+        if (hasError) {
+            convertView.setBackgroundColor(parent.getContext().getResources().getColor(android.R.color.holo_red_light)); // Màu nền đỏ
+        } else {
+            convertView.setBackgroundColor(parent.getContext().getResources().getColor(android.R.color.background_light)); // Màu nền mặc định
+        }
         return convertView;
     }
 
@@ -78,8 +93,12 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
             convertView = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
         }
         TextView textView = convertView.findViewById(android.R.id.text1);
-        textView.setText("Đèn "+lightData.toString()); // Modify as per your need
-
+        textView.setText("Đèn "+lightData.toString());
+        if (lightData.getError() > 0) {
+            convertView.setBackgroundColor(parent.getContext().getResources().getColor(android.R.color.holo_red_light)); // Màu nền đỏ
+        } else {
+            convertView.setBackgroundColor(parent.getContext().getResources().getColor(android.R.color.background_light)); // Màu nền mặc định
+        }
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -87,6 +106,7 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
                 if (isValidLocationFormat(location)) {
                     Intent intent = new Intent(context, MainActivity.class);
                     intent.putExtra("LOCATION", location);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(intent);
                 } else {
                     Log.e("MyExpandableListAdapter", "Invalid location format: " + location);
