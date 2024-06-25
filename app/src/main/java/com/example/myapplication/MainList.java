@@ -3,6 +3,7 @@ package com.example.myapplication;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
@@ -127,6 +128,20 @@ public class MainList extends AppCompatActivity {
                 textViewLightName.setText("Name of Light: Light1");
             }
         });
+        spinnerKhuvuc.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String khuVuc = parent.getItemAtPosition(position).toString();
+                String lightName = generateLightNameForOption1(khuVuc); 
+                textViewLightName.setText("Name of Light: " + lightName);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Không cần xử lý gì khi không có gì được chọn
+            }
+        });
+
 
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, listGroupTitles);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -164,7 +179,6 @@ public class MainList extends AppCompatActivity {
                         Toast.makeText(this, "Không thể tạo tên đèn. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    textViewLightName.setText("Tên đèn: " + lightName);
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
