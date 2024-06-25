@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">App installation and warranty</string>
+    <string name="mapbox_access_token">sk.eyJ1IjoidGFudG5uaDAwIiwiYSI6ImNseG9lNHR4MDBiNXYycXIydzI1MXNxbm4ifQ.qHk8RcH85v6cmfnV0__-Bg</string>
+    <string name="select_khuvuc">Select Khuvuc</string>
+    <string name="new_khuvuc">New Khuvuc</string>
+    <string name="light_name">Light Name</string>
+</resources>
