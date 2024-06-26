@@ -96,7 +96,7 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
             convertView = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
         }
         TextView textView = convertView.findViewById(android.R.id.text1);
-        textView.setText("Đèn "+lightData.toString());
+        textView.setText("          Đèn "+lightData.toString());
         if (lightData.getError() > 0) {
             convertView.setBackgroundColor(parent.getContext().getResources().getColor(android.R.color.holo_red_light)); // Màu nền đỏ
         } else {
