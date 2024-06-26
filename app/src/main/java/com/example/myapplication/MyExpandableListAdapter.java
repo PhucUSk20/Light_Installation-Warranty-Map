@@ -9,18 +9,18 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 import java.util.List;
-import java.util.Map;
+
 public class MyExpandableListAdapter extends BaseExpandableListAdapter {
 
     private List<String> listGroupTitles;
-    private Map<String, List<LightData>> listData; // Change to store LightData objects
+    private java.util.Map<String, List<LightData>> listData; // Change to store LightData objects
     private Context context;
 
     public MyExpandableListAdapter(Context context) {
         this.context = context;
     }
 
-    public void setData(List<String> listGroupTitles, Map<String, List<LightData>> listData) {
+    public void setData(List<String> listGroupTitles, java.util.Map<String, List<LightData>> listData) {
         this.listGroupTitles = listGroupTitles;
         this.listData = listData;
     }
@@ -107,7 +107,7 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
             public void onClick(View view) {
                 String location = lightData.getLocation();
                 if (isValidLocationFormat(location)) {
-                    Intent intent = new Intent(context, MainActivity.class);
+                    Intent intent = new Intent(context, Map.class);
                     intent.putExtra("LOCATION", location);
                     intent.putExtra("error", error);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

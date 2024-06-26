@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -14,8 +15,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -29,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class MainList extends AppCompatActivity {
+public class HomeFragment extends Fragment {
 
     ExpandableListView expandableListView;
     FloatingActionButton fab;
@@ -37,40 +41,25 @@ public class MainList extends AppCompatActivity {
     Map<String, List<LightData>> listData;
     MyExpandableListAdapter listAdapter;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.mainlist);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        expandableListView = findViewById(R.id.expandableListView);
-        fab = findViewById(R.id.fab);
+        expandableListView = view.findViewById(R.id.expandableListView);
+        fab = view.findViewById(R.id.fab);
 
         initializeData();
-        listAdapter = new MyExpandableListAdapter(this);
+        listAdapter = new MyExpandableListAdapter(getContext());
         listAdapter.setData(listGroupTitles, listData);
         expandableListView.setAdapter(listAdapter);
 
         fab.setOnClickListener(v -> showCreateLightDialog());
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int itemId = item.getItemId();
-                if (itemId == R.id.navigation_home) {
-                    Toast.makeText(MainList.this, "Home selected", Toast.LENGTH_SHORT).show();
-                    return true;
-                } else if (itemId == R.id.navigation_historywarranty) {
-                    Toast.makeText(MainList.this, "Dashboard selected", Toast.LENGTH_SHORT).show();
-                    return true;
-                } else if (itemId == R.id.navigation_setting) {
-                    Toast.makeText(MainList.this, "Notifications selected", Toast.LENGTH_SHORT).show();
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        });
+
+
+        return view;
     }
+
 
     private void initializeData() {
         listGroupTitles = new ArrayList<>();
@@ -106,14 +95,14 @@ public class MainList extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        Toast.makeText(MainList.this, "Failed to load data.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Failed to load data.", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(MainList.this, "Failed to load location data.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Failed to load location data.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -124,7 +113,7 @@ public class MainList extends AppCompatActivity {
     }
 
     private void showCreateLightDialog() {
-        LayoutInflater inflater = LayoutInflater.from(this);
+        LayoutInflater inflater = LayoutInflater.from(getContext());
         View dialogView = inflater.inflate(R.layout.dialog_create_light, null);
         Spinner spinnerKhuvuc = dialogView.findViewById(R.id.spinnerKhuvuc);
         EditText editTextNewKhuvuc = dialogView.findViewById(R.id.editTextNewKhuvuc);
@@ -164,12 +153,11 @@ public class MainList extends AppCompatActivity {
             }
         });
 
-
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, listGroupTitles);
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, listGroupTitles);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerKhuvuc.setAdapter(spinnerAdapter);
 
-        new AlertDialog.Builder(this)
+        new AlertDialog.Builder(getContext())
                 .setTitle("Create New Light")
                 .setView(dialogView)
                 .setPositiveButton("Create", (dialog, which) -> {
@@ -178,7 +166,7 @@ public class MainList extends AppCompatActivity {
                     String location = editTextLocation.getText().toString().trim();
 
                     if (location.isEmpty()) {
-                        Toast.makeText(this, "Địa chỉ không được để trống", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Địa chỉ không được để trống", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
@@ -187,7 +175,7 @@ public class MainList extends AppCompatActivity {
                         if (spinnerKhuvuc.getSelectedItem() != null) {
                             khuVuc = spinnerKhuvuc.getSelectedItem().toString();
                             lightName = generateLightNameForOption1(khuVuc);
-                            queryKhuVucNames( khuVuc,  lightName,  location);
+                            queryKhuVucNames(khuVuc, lightName, location);
                         }
                     } else if (selectedRadioButtonId == R.id.radioButtonOption2) {
                         khuVuc = editTextNewKhuvuc.getText().toString().trim();
@@ -198,13 +186,14 @@ public class MainList extends AppCompatActivity {
                     }
 
                     if (lightName.isEmpty()) {
-                        Toast.makeText(this, "Không thể tạo tên đèn. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Không thể tạo tên đèn. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
                         return;
                     }
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
     }
+
     private void queryKhuVucNames(String khuVuc, String lightName, String location) {
         FirebaseDatabase.getInstance().getReference("Location")
                 .orderByValue()
@@ -219,17 +208,16 @@ public class MainList extends AppCompatActivity {
                                 return;
                             }
                         } else {
-                            Toast.makeText(MainList.this, "Không tìm thấy khu vực trong Location", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Không tìm thấy khu vực trong Location", Toast.LENGTH_SHORT).show();
                         }
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Toast.makeText(MainList.this, "Lỗi khi truy vấn dữ liệu từ Firebase", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Lỗi khi truy vấn dữ liệu từ Firebase", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
-
 
     private String generateLightNameForOption1(String khuVuc) {
         int maxNumber = 0;
@@ -278,25 +266,25 @@ public class MainList extends AppCompatActivity {
                         .child(newKhuvucName)
                         .setValue(displayName)
                         .addOnSuccessListener(aVoid -> {
-                            Toast.makeText(MainList.this, "Khuvuc created successfully", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Khuvuc created successfully", Toast.LENGTH_SHORT).show();
                             initializeData();
-                            listAdapter = new MyExpandableListAdapter(getApplicationContext());
+                            listAdapter = new MyExpandableListAdapter(getContext());
                             listAdapter.setData(listGroupTitles, listData);
 
                             expandableListView.setAdapter(listAdapter);
                         })
-                        .addOnFailureListener(e -> Toast.makeText(MainList.this, "Failed to create khuvuc", Toast.LENGTH_SHORT).show());
+                        .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to create khuvuc", Toast.LENGTH_SHORT).show());
                 FirebaseDatabase.getInstance().getReference("LightStreet")
                         .child(newKhuvucName)
                         .child("Light1")
                         .setValue(new LightData("Light1", 0, location, 1, 2000, 100, 5))
-                        .addOnSuccessListener(aVoid -> Toast.makeText(MainList.this, "StreetLight created successfully", Toast.LENGTH_SHORT).show())
-                        .addOnFailureListener(e -> Toast.makeText(MainList.this, "Failed to create StreetLight", Toast.LENGTH_SHORT).show());
+                        .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "StreetLight created successfully", Toast.LENGTH_SHORT).show())
+                        .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to create StreetLight", Toast.LENGTH_SHORT).show());
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(MainList.this, "Failed to create khuvuc", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Failed to create khuvuc", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -307,7 +295,7 @@ public class MainList extends AppCompatActivity {
                 .child(khuVuc)
                 .child(lightName)
                 .setValue(newLightData)
-                .addOnSuccessListener(aVoid -> Toast.makeText(MainList.this, "Light created successfully", Toast.LENGTH_SHORT).show())
-                .addOnFailureListener(e -> Toast.makeText(MainList.this, "Failed to create light", Toast.LENGTH_SHORT).show());
+                .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Light created successfully", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to create light", Toast.LENGTH_SHORT).show());
     }
 }
