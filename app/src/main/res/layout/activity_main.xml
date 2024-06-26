@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -24,10 +23,21 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10sp"
         android:layout_marginEnd="10sp"
+        android:layout_above="@id/setRoute"
+        android:layout_marginBottom="10sp"
+        android:id="@+id/updateFirebase"
+        android:visibility="visible"
+        android:text="Completed repair"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10sp"
+        android:layout_marginEnd="10sp"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="20sp"
         android:id="@+id/setRoute"
-        android:text="Set Route"/>
+        android:text="Reset Route"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:layout_width="wrap_content"

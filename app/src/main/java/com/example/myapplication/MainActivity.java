@@ -21,6 +21,7 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import com.google.android.material.button.MaterialButton;
@@ -96,6 +97,7 @@ import com.google.firebase.database.FirebaseDatabase;
 public class MainActivity extends AppCompatActivity {
     private MapView mapView;
     private MaterialButton setRoute;
+    private MaterialButton updateFirebase;
     private FloatingActionButton focusLocationBtn;
     private final NavigationLocationProvider navigationLocationProvider = new NavigationLocationProvider();
     private MapboxRouteLineView routeLineView;
@@ -218,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
         mapView = findViewById(R.id.mapView);
         focusLocationBtn = findViewById(R.id.focusLocation);
         setRoute = findViewById(R.id.setRoute);
-
+        updateFirebase = findViewById(R.id.updateFirebase);
         MapboxRouteLineOptions options = new MapboxRouteLineOptions.Builder(this)
                 .withRouteLineResources(new RouteLineResources.Builder().build())
                 .withRouteLineBelowLayerId(LocationComponentConstants.LOCATION_INDICATOR_LAYER).build();
@@ -236,11 +238,17 @@ public class MainActivity extends AppCompatActivity {
         mapboxNavigation.registerRoutesObserver(routesObserver);
         mapboxNavigation.registerLocationObserver(locationObserver);
         mapboxNavigation.registerVoiceInstructionsObserver(voiceInstructionsObserver);
-        databaseReference = FirebaseDatabase.getInstance().getReference().child("Data");
+        databaseReference = FirebaseDatabase.getInstance().getReference().child("LightStreet");
 
         // Đọc dữ liệu từ Realtime Database và gán vào biến A và B
        // readLocationFromFirebase();
         Intent intent = getIntent();
+        String error = intent.getStringExtra("error");
+        if ("error".equals(error)) {
+            updateFirebase.setVisibility(View.VISIBLE);
+        } else {
+            updateFirebase.setVisibility(View.GONE);
+        }
         if (intent != null && intent.hasExtra(EXTRA_LOCATION)) {
             String location = intent.getStringExtra(EXTRA_LOCATION);
             if (isValidLocationFormat(location)) {
@@ -296,6 +304,21 @@ public class MainActivity extends AppCompatActivity {
                 fetchRoute();
             }
         });
+        updateFirebase.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Hiển thị dialog xác nhận
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Confirm")
+                        .setMessage("Bạn có chắc chắn muốn xác nhận việc kiểm tra và sửa chữa đã hoàn tất?")
+                        .setPositiveButton("Xác nhận", (dialog, which) -> {
+                            // Thực hiện cập nhật Firebase nếu người dùng xác nhận
+                            updateFirebaseData();
+                        })
+                        .setNegativeButton("Hủy", null)
+                        .show();
+            }
+        });
 
         mapView.getMapboxMap().loadStyleUri(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
             @Override
@@ -333,6 +356,51 @@ public class MainActivity extends AppCompatActivity {
                         focusLocationBtn.hide();
                     }
                 });
+            }
+        });
+    }
+    private void updateFirebaseData() {
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    boolean found = false;
+                    for (DataSnapshot khuVucSnapshot : dataSnapshot.getChildren()) {
+                        for (DataSnapshot lightSnapshot : khuVucSnapshot.getChildren()) {
+                            String location = lightSnapshot.child("location").getValue(String.class);
+                            Log.d("FirebaseLocation", "Checking location: " + location);
+                            if (location != null && location.equals(latA + "," + longB)) {
+                                Log.d("FirebaseLocation", "Matching location found: " + location);
+                                lightSnapshot.getRef().child("error").setValue(0);
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found) {
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        Toast.makeText(MainActivity.this, "Firebase updated successfully", Toast.LENGTH_SHORT).show();
+                        // Navigate back to MainList
+                        Intent intent = new Intent(MainActivity.this, MainList.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Toast.makeText(MainActivity.this, "No matching location found", Toast.LENGTH_SHORT).show();
+                        Log.e("FirebaseLocation", "No matching location found for: " + latA + "," + longB);
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this, "No data found", Toast.LENGTH_SHORT).show();
+                    Log.e("FirebaseLocation", "No data found in Firebase");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(MainActivity.this, "Failed to update Firebase: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("FirebaseLocation", "Failed to update Firebase: " + databaseError.getMessage());
             }
         });
     }

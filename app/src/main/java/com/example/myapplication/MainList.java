@@ -132,7 +132,7 @@ public class MainList extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String khuVuc = parent.getItemAtPosition(position).toString();
-                String lightName = generateLightNameForOption1(khuVuc); 
+                String lightName = generateLightNameForOption1(khuVuc);
                 textViewLightName.setText("Name of Light: " + lightName);
             }
 

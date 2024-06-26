@@ -89,6 +89,9 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         LightData lightData = (LightData) getChild(groupPosition, childPosition);
+
+        String error = lightData.getError() > 0 ? "error" : "noerror";
+
         if (convertView == null) {
             convertView = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
         }
@@ -106,6 +109,7 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
                 if (isValidLocationFormat(location)) {
                     Intent intent = new Intent(context, MainActivity.class);
                     intent.putExtra("LOCATION", location);
+                    intent.putExtra("error", error);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(intent);
                 } else {
