@@ -364,32 +364,54 @@ public class Map extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    boolean found = false;
                     for (DataSnapshot khuVucSnapshot : dataSnapshot.getChildren()) {
                         for (DataSnapshot lightSnapshot : khuVucSnapshot.getChildren()) {
                             String location = lightSnapshot.child("location").getValue(String.class);
-                            Log.d("FirebaseLocation", "Checking location: " + location);
                             if (location != null && location.equals(latA + "," + longB)) {
-                                Log.d("FirebaseLocation", "Matching location found: " + location);
-                                lightSnapshot.getRef().child("error").setValue(0);
-                                found = true;
+                                String lightId2 = khuVucSnapshot.getKey() + "-" + lightSnapshot.getKey();
+                                DatabaseReference warrantyRef = FirebaseDatabase.getInstance().getReference("Warranty");
+
+                                warrantyRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        if (dataSnapshot.exists()) {
+                                            boolean found = false;
+
+                                            // Iterate through each child of "Warranty"
+                                            for (DataSnapshot warrantySnapshot : dataSnapshot.getChildren()) {
+                                                String lightId = warrantySnapshot.child("lightid").getValue(String.class);
+                                                if (lightId != null && lightId.equals(lightId2)) {
+                                                    Log.d("FirebaseLocation", "Found matching lightId in Warranty: " + lightId);
+
+                                                    // Update status to "Complete"
+                                                    warrantySnapshot.getRef().child("status").setValue("Complete");
+                                                    lightSnapshot.getRef().child("error").setValue(0);
+                                                    found = true;
+                                                    break; // Exit loop once found
+                                                }
+                                            }
+
+                                            if (found) {
+                                                Toast.makeText(Map.this, "Updated successfully", Toast.LENGTH_SHORT).show();
+                                                Intent intent = new Intent(Map.this, MainActivity.class);
+                                                startActivity(intent);
+                                                finish();
+                                            }
+                                        } else {
+                                            Toast.makeText(Map.this, "No data found", Toast.LENGTH_SHORT).show();
+                                            Log.e("FirebaseLocation", "No data found in Firebase");
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                        Toast.makeText(Map.this, "Failed to update Firebase: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                                        Log.e("FirebaseLocation", "Failed to update Firebase: " + databaseError.getMessage());
+                                    }
+                                });
                                 break;
                             }
                         }
-                        if (found) {
-                            break;
-                        }
-                    }
-
-                    if (found) {
-                        Toast.makeText(Map.this, "Firebase updated successfully", Toast.LENGTH_SHORT).show();
-                        // Navigate back to MainList
-                        Intent intent = new Intent(Map.this, MainList.class);
-                        startActivity(intent);
-                        finish();
-                    } else {
-                        Toast.makeText(Map.this, "No matching location found", Toast.LENGTH_SHORT).show();
-                        Log.e("FirebaseLocation", "No matching location found for: " + latA + "," + longB);
                     }
                 } else {
                     Toast.makeText(Map.this, "No data found", Toast.LENGTH_SHORT).show();
@@ -404,6 +426,7 @@ public class Map extends AppCompatActivity {
             }
         });
     }
+
     private boolean isValidLocationFormat(String location) {
         String[] parts = location.split(",");
         if (parts.length != 2) {

@@ -4,4 +4,5 @@
     <string name="select_khuvuc">Select Khuvuc</string>
     <string name="new_khuvuc">New Khuvuc</string>
     <string name="light_name">Light Name</string>
+    <string name="status_icon">Status Icon</string>
 </resources>

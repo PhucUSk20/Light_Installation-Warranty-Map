@@ -30,17 +30,14 @@ public class MainActivity extends AppCompatActivity {
                 Fragment selectedFragment = null;
                 int itemId = item.getItemId();
                 if (itemId == R.id.navigation_home) {
-                    Toast.makeText(MainActivity.this, "Home selected", Toast.LENGTH_SHORT).show();
                     selectedFragment = new HomeFragment();
                     loadFragment(selectedFragment);
                     return true;
                 } else if (itemId == R.id.navigation_historywarranty) {
-                    Toast.makeText(MainActivity.this, "Dashboard selected", Toast.LENGTH_SHORT).show();
                     selectedFragment = new WarrantyFragment();
                     loadFragment(selectedFragment);
                     return true;
                 } else if (itemId == R.id.navigation_setting) {
-                    Toast.makeText(MainActivity.this, "Notifications selected", Toast.LENGTH_SHORT).show();
                     return true;
                 } else {
                     return false;
