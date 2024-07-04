@@ -190,7 +190,7 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
                                         String lightid = groupTitle + "-" + lightData.getLightName();
                                         newTaskRef.child("lightid").setValue(lightid);
                                         newTaskRef.child("status").setValue("Processing");
-                                        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy-HH:mm", Locale.getDefault());
                                         String currentTime = sdf.format(new Date());
                                         newTaskRef.child("timestamp").setValue(currentTime);
                                     }

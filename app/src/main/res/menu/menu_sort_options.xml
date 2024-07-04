@@ -1,0 +1,12 @@
+<!-- res/menu/menu_sort_options.xml -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/sort_by_date"
+        android:title="Sort by Date"/>
+    <item
+        android:id="@+id/sort_by_status"
+        android:title="Sort by Status"/>
+    <item
+        android:id="@+id/sort_combined"
+        android:title="Sort Combined"/>
+</menu>
