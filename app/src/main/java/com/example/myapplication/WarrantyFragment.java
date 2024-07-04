@@ -49,6 +49,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.PopupMenu;
+import android.widget.ProgressBar;
+
 import androidx.core.view.MenuItemCompat;
 
 import java.util.Collections;
@@ -59,7 +61,7 @@ public class WarrantyFragment extends Fragment {
     private ListView listView;
     private WarrantyAdapter adapter;
     private List<WarrantyData> warrantyList;
-
+    private ProgressBar progressBar;
     public WarrantyFragment() {
     }
 
@@ -71,7 +73,9 @@ public class WarrantyFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true); // Add this line to enable the options menu
-        return inflater.inflate(R.layout.fragment_warranty, container, false);
+        View view = inflater.inflate(R.layout.fragment_warranty, container, false);
+        progressBar = view.findViewById(R.id.progressBar);
+        return view;
     }
 
     @Override
@@ -131,6 +135,7 @@ public class WarrantyFragment extends Fragment {
     }
 
     private void sortByDate() {
+        progressBar.setVisibility(View.VISIBLE);
         Collections.sort(warrantyList, new Comparator<WarrantyData>() {
             @Override
             public int compare(WarrantyData o1, WarrantyData o2) {
@@ -138,9 +143,11 @@ public class WarrantyFragment extends Fragment {
             }
         });
         adapter.notifyDataSetChanged();
+        progressBar.setVisibility(View.GONE);
     }
 
     private void sortByStatus() {
+        progressBar.setVisibility(View.VISIBLE);
         Collections.sort(warrantyList, new Comparator<WarrantyData>() {
             @Override
             public int compare(WarrantyData o1, WarrantyData o2) {
@@ -148,9 +155,11 @@ public class WarrantyFragment extends Fragment {
             }
         });
         adapter.notifyDataSetChanged();
+        progressBar.setVisibility(View.GONE);
     }
 
     private void sortCombined() {
+        progressBar.setVisibility(View.VISIBLE);
         Collections.sort(warrantyList, new Comparator<WarrantyData>() {
             @Override
             public int compare(WarrantyData o1, WarrantyData o2) {
@@ -161,9 +170,11 @@ public class WarrantyFragment extends Fragment {
             }
         });
         adapter.notifyDataSetChanged();
+        progressBar.setVisibility(View.GONE);
     }
 
     private void loadDataFromFirebase() {
+        progressBar.setVisibility(View.VISIBLE);
         FirebaseDatabase.getInstance().getReference("Warranty").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -175,6 +186,7 @@ public class WarrantyFragment extends Fragment {
                     }
                 }
                 adapter.notifyDataSetChanged();
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override

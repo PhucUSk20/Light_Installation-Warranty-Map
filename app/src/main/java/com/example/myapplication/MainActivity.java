@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (savedInstanceState == null) {
             loadFragment(new HomeFragment());
+            getSupportActionBar().setTitle("Home"); // Set initial title
         }
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
@@ -32,12 +33,15 @@ public class MainActivity extends AppCompatActivity {
                 if (itemId == R.id.navigation_home) {
                     selectedFragment = new HomeFragment();
                     loadFragment(selectedFragment);
+                    getSupportActionBar().setTitle("Home"); // Set title for Home
                     return true;
                 } else if (itemId == R.id.navigation_historywarranty) {
                     selectedFragment = new WarrantyFragment();
                     loadFragment(selectedFragment);
+                    getSupportActionBar().setTitle("Warranty History"); // Set title for Warranty
                     return true;
                 } else if (itemId == R.id.navigation_setting) {
+                    getSupportActionBar().setTitle("Settings"); // Set title for Settings
                     return true;
                 } else {
                     return false;

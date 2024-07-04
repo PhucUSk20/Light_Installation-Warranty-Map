@@ -6,6 +6,13 @@
     android:layout_height="match_parent"
     tools:context=".HomeFragment">
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
     <ExpandableListView
         android:id="@+id/expandableListView"
         android:layout_width="match_parent"
@@ -13,7 +20,8 @@
         android:divider="@android:color/darker_gray"
         android:dividerHeight="0.5dp"
         android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
-        android:padding="16dp" />
+        android:padding="16dp"
+        android:visibility="gone"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
@@ -27,5 +35,6 @@
         android:layout_marginBottom="20dp"
         android:src="@drawable/ic_add"
         app:backgroundTint="@color/purple_500"
-        app:tint="@android:color/white" />
+        app:tint="@android:color/white"
+        android:visibility="gone"/>
 </RelativeLayout>

@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -40,6 +41,7 @@ public class HomeFragment extends Fragment {
     private static final int REQUEST_CODE_SELECT_LOCATION = 1;
     ExpandableListView expandableListView;
     FloatingActionButton fab;
+    ProgressBar progressBar;
     List<String> listGroupTitles;
     Map<String, List<LightData>> listData;
     MyExpandableListAdapter listAdapter;
@@ -52,7 +54,7 @@ public class HomeFragment extends Fragment {
 
         expandableListView = view.findViewById(R.id.expandableListView);
         fab = view.findViewById(R.id.fab);
-
+        progressBar = view.findViewById(R.id.progressBar);
         initializeData();
         listAdapter = new MyExpandableListAdapter(getContext());
         listAdapter.setData(listGroupTitles, listData);
@@ -68,7 +70,9 @@ public class HomeFragment extends Fragment {
     private void initializeData() {
         listGroupTitles = new ArrayList<>();
         listData = new HashMap<>();
-
+        progressBar.setVisibility(View.VISIBLE);
+        expandableListView.setVisibility(View.GONE);
+        fab.setVisibility(View.GONE);
         FirebaseDatabase.getInstance().getReference("Location").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot locationSnapshot) {
@@ -95,6 +99,9 @@ public class HomeFragment extends Fragment {
                             }
                         }
                         listAdapter.notifyDataSetChanged();
+                        progressBar.setVisibility(View.GONE);
+                        expandableListView.setVisibility(View.VISIBLE);
+                        fab.setVisibility(View.VISIBLE);
                     }
 
                     @Override
