@@ -25,7 +25,6 @@ public class WarrantyFragment extends Fragment {
     private List<WarrantyData> warrantyList;
 
     public WarrantyFragment() {
-        // Required empty public constructor
     }
 
     public static WarrantyFragment newInstance() {

@@ -1,5 +1,7 @@
 package com.example.myapplication;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -7,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.RadioButton;
@@ -34,12 +37,13 @@ import java.util.Map;
 import java.util.UUID;
 
 public class HomeFragment extends Fragment {
-
+    private static final int REQUEST_CODE_SELECT_LOCATION = 1;
     ExpandableListView expandableListView;
     FloatingActionButton fab;
     List<String> listGroupTitles;
     Map<String, List<LightData>> listData;
     MyExpandableListAdapter listAdapter;
+    EditText editTextDialogLocation;
 
     @Nullable
     @Override
@@ -112,20 +116,25 @@ public class HomeFragment extends Fragment {
         listData.clear();
     }
 
+    // Trong phương thức showCreateLightDialog()
     private void showCreateLightDialog() {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         View dialogView = inflater.inflate(R.layout.dialog_create_light, null);
         Spinner spinnerKhuvuc = dialogView.findViewById(R.id.spinnerKhuvuc);
         EditText editTextNewKhuvuc = dialogView.findViewById(R.id.editTextNewKhuvuc);
-        EditText editTextLocation = dialogView.findViewById(R.id.editTextLocation);
+        editTextDialogLocation = dialogView.findViewById(R.id.editTextLocation);
         TextView textViewLightName = dialogView.findViewById(R.id.textViewLightName);
 
         RadioGroup radioGroup = dialogView.findViewById(R.id.radioGroup);
         RadioButton radioButtonOption1 = dialogView.findViewById(R.id.radioButtonOption1);
         RadioButton radioButtonOption2 = dialogView.findViewById(R.id.radioButtonOption2);
+        Button buttonSelectLocation = dialogView.findViewById(R.id.btnChooseFromMap);
+
 
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            // Xử lý thay đổi của RadioGroup
             if (checkedId == R.id.radioButtonOption1) {
+                // Xử lý khi chọn Option 1
                 spinnerKhuvuc.setVisibility(View.VISIBLE);
                 editTextNewKhuvuc.setVisibility(View.GONE);
                 if (spinnerKhuvuc.getSelectedItem() != null) {
@@ -134,11 +143,13 @@ public class HomeFragment extends Fragment {
                     textViewLightName.setText("Name of Light: " + lightName);
                 }
             } else if (checkedId == R.id.radioButtonOption2) {
+                // Xử lý khi chọn Option 2
                 spinnerKhuvuc.setVisibility(View.GONE);
                 editTextNewKhuvuc.setVisibility(View.VISIBLE);
                 textViewLightName.setText("Name of Light: Light1");
             }
         });
+
         spinnerKhuvuc.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -157,13 +168,19 @@ public class HomeFragment extends Fragment {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerKhuvuc.setAdapter(spinnerAdapter);
 
+
+        buttonSelectLocation.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), SelectLocation.class);
+            startActivityForResult(intent, REQUEST_CODE_SELECT_LOCATION);
+        });
+
         new AlertDialog.Builder(getContext())
                 .setTitle("Create New Light")
                 .setView(dialogView)
                 .setPositiveButton("Create", (dialog, which) -> {
                     String khuVuc = "";
                     String lightName = "";
-                    String location = editTextLocation.getText().toString().trim();
+                    String location = editTextDialogLocation.getText().toString().trim();
 
                     if (location.isEmpty()) {
                         Toast.makeText(getContext(), "Địa chỉ không được để trống", Toast.LENGTH_SHORT).show();
@@ -192,6 +209,17 @@ public class HomeFragment extends Fragment {
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_SELECT_LOCATION && resultCode == Activity.RESULT_OK && data != null) {
+            double longitude = data.getDoubleExtra("longitude", 0.0);
+            double latitude = data.getDoubleExtra("latitude", 0.0);
+            if (editTextDialogLocation != null) {
+                editTextDialogLocation.setText(longitude + "," + latitude);
+            }
+        }
     }
 
     private void queryKhuVucNames(String khuVuc, String lightName, String location) {

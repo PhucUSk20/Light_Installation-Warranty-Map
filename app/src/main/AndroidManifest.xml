@@ -32,6 +32,10 @@
             android:name=".Map"
             android:exported="true">
         </activity>
+        <activity
+            android:name=".SelectLocation"
+            android:exported="true">
+        </activity>
 
     </application>
 

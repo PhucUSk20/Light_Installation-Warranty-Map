@@ -28,7 +28,8 @@
         android:id="@+id/spinnerKhuvuc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="21dp"
+        android:layout_marginBottom="12dp"
         android:visibility="gone" />
 
     <EditText
@@ -36,7 +37,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Nhập khu vực mới"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="12dp"
         android:visibility="gone" />
 
     <EditText
@@ -45,6 +46,12 @@
         android:layout_height="wrap_content"
         android:hint="Nhập tọa độ"
         android:layout_marginBottom="16dp" />
+    <Button
+        android:id="@+id/btnChooseFromMap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Chọn vị trí hiện tại từ bản đồ"
+        android:layout_marginTop="16dp" />
 
     <TextView
         android:id="@+id/textViewLightName"
