@@ -2,27 +2,48 @@
     <!-- Base application theme -->
     <style name="Base.Theme.MyApplication" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary color -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorPrimary">@color/colorPrimary</item> <!-- Thay đổi thành màu chính mong muốn -->
+        <item name="colorPrimaryVariant">@color/colorPrimaryVariant</item> <!-- Thay đổi thành biến thể màu chính -->
+        <item name="colorOnPrimary">@android:color/white</item> <!-- Màu chữ trên màu chính -->
+
         <!-- Secondary color -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorOnSecondary">@android:color/black</item>
+        <item name="colorSecondary">@color/colorSecondary</item> <!-- Thay đổi thành màu phụ mong muốn -->
+        <item name="colorSecondaryVariant">@color/colorSecondaryVariant</item> <!-- Thay đổi thành biến thể màu phụ -->
+        <item name="colorOnSecondary">@android:color/black</item> <!-- Màu chữ trên màu phụ -->
     </style>
 
     <style name="Theme.MyApplication" parent="Base.Theme.MyApplication">
         <!-- Customize your default theme here. -->
     </style>
+
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/colorPrimary</item> <!-- Thay đổi thành màu chính mong muốn -->
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item> <!-- Thay đổi thành màu chính đậm -->
+        <item name="colorAccent">@color/colorAccent</item> <!-- Thay đổi thành màu nhấn mong muốn -->
     </style>
 
     <!-- Fullscreen theme for SplashActivity -->
     <style name="SplashTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowFullscreen">true</item> <!-- Cho phép toàn màn hình -->
     </style>
+
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here -->
+    </style>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="ToolbarColoredIcon" parent="AppTheme">
+        <item name="android:textColorSecondary">@color/dark_gray</item>
+        <item name="android:tint">@color/dark_gray</item>
+        <item name="android:textColorPrimary">@color/dark_gray</item>
+        <item name="android:textColorHighlight">@color/dark_gray</item>
+        <item name="colorControlNormal">@color/dark_gray</item>
+    </style>
+    <style name="activity_custom" parent="AppTheme">
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
 </resources>

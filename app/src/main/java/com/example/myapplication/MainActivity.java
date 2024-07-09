@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
                     getSupportActionBar().setTitle("Warranty History"); // Set title for Warranty
                     return true;
                 } else if (itemId == R.id.navigation_setting) {
+                    selectedFragment = new SettingFragment();
+                    loadFragment(selectedFragment);
                     getSupportActionBar().setTitle("Settings"); // Set title for Settings
                     return true;
                 } else {
