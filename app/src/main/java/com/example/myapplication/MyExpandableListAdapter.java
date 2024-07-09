@@ -193,7 +193,19 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         String assignedTo = dataSnapshot.child("assignedTo").getValue(String.class);
-                                        if (assignedTo != null && assignedTo.equals(username)) {
+                                        if (lightData.getError() == 0){
+                                            String location = lightData.getLocation();
+                                            if (isValidLocationFormat(location)) {
+                                                Intent intent = new Intent(context, Map.class);
+                                                intent.putExtra("LOCATION", location);
+                                                intent.putExtra("error", error);
+                                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                context.startActivity(intent);
+                                            }else {
+                                                Log.e("MyExpandableListAdapter", "Invalid location format: " + location);
+                                            }
+                                        }
+                                        else if (assignedTo != null && assignedTo.equals(username)) {
                                             String location = lightData.getLocation();
                                             if (isValidLocationFormat(location)) {
                                                 Intent intent = new Intent(context, Map.class);

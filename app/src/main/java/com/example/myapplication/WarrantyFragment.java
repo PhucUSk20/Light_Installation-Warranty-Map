@@ -1,6 +1,9 @@
 package com.example.myapplication;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -172,27 +175,34 @@ public class WarrantyFragment extends Fragment {
         adapter.notifyDataSetChanged();
         progressBar.setVisibility(View.GONE);
     }
-
     private void loadDataFromFirebase() {
         progressBar.setVisibility(View.VISIBLE);
-        FirebaseDatabase.getInstance().getReference("Warranty").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                warrantyList.clear();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    WarrantyData warrantyData = snapshot.getValue(WarrantyData.class);
-                    if (warrantyData != null) {
-                        warrantyList.add(warrantyData);
-                    }
-                }
-                adapter.notifyDataSetChanged();
-                progressBar.setVisibility(View.GONE);
-            }
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
+        String username = sharedPreferences.getString("username", "default_username");
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle possible errors.
-            }
-        });
+        FirebaseDatabase.getInstance().getReference("Warranty")
+                .orderByChild("assignedTo")
+                .equalTo(username)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        warrantyList.clear();
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            WarrantyData warrantyData = snapshot.getValue(WarrantyData.class);
+                            if (warrantyData != null) {
+                                warrantyList.add(warrantyData);
+                            }
+                        }
+                        adapter.notifyDataSetChanged();
+                        progressBar.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        // Handle possible errors.
+                        progressBar.setVisibility(View.GONE);
+                        Log.e("Firebase", "Error loading Warranty data", databaseError.toException());
+                    }
+                });
     }
 }

@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +31,8 @@ public class SettingFragment extends Fragment {
     TextView textName;
     TextView textEmail;
     DatabaseReference usersRef;
+    ProgressBar progressBar;
+    LinearLayout settingsLayout,headerLayout;
 
     public SettingFragment() {
         // Required empty public constructor
@@ -44,6 +47,9 @@ public class SettingFragment extends Fragment {
         imageAvatar = view.findViewById(R.id.image_avatar);
         textName = view.findViewById(R.id.text_name);
         textEmail = view.findViewById(R.id.text_email);
+        progressBar = view.findViewById(R.id.progressBar);
+        settingsLayout = view.findViewById(R.id.layout_setting);
+        headerLayout = view.findViewById(R.id.layout_header);
         usersRef = FirebaseDatabase.getInstance().getReference("Users");
         SharedPreferences prefs = requireContext().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
         String username = prefs.getString("username", "");
@@ -99,27 +105,35 @@ public class SettingFragment extends Fragment {
         return view;
     }
     private void loadUserData(String username) {
+        progressBar.setVisibility(View.VISIBLE);
+        settingsLayout.setVisibility(View.GONE);
+        headerLayout.setVisibility(View.GONE);
         usersRef.orderByChild("username").equalTo(username).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                        progressBar.setVisibility(View.GONE);
+                        settingsLayout.setVisibility(View.VISIBLE);
+                        headerLayout.setVisibility(View.VISIBLE);
                         String email = userSnapshot.child("email").getValue(String.class);
                         String imageUrl = userSnapshot.child("imageUrl").getValue(String.class);
-                        String name = userSnapshot.child("name").getValue(String.class);
+                        String username = userSnapshot.child("username").getValue(String.class);
 
                         // Set user info
                         textEmail.setText(email);
-                        textName.setText(name);
+                        textName.setText(username);
                         Picasso.get().load(imageUrl).into(imageAvatar);
                     }
                 } else {
+                    progressBar.setVisibility(View.GONE);
                     Toast.makeText(requireContext(), "User not found", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                progressBar.setVisibility(View.GONE);
                 Toast.makeText(requireContext(), "Failed to load user data", Toast.LENGTH_SHORT).show();
             }
         });
