@@ -289,7 +289,7 @@ public class MainList extends AppCompatActivity {
                 FirebaseDatabase.getInstance().getReference("LightStreet")
                         .child(newKhuvucName)
                         .child("Light1")
-                        .setValue(new LightData("Light1", 0, location, 1, 2000, 100, 5))
+                        .setValue(new LightData("Light1", 0, location, 1, 2000, 100, 5,"empty"))
                         .addOnSuccessListener(aVoid -> Toast.makeText(MainList.this, "StreetLight created successfully", Toast.LENGTH_SHORT).show())
                         .addOnFailureListener(e -> Toast.makeText(MainList.this, "Failed to create StreetLight", Toast.LENGTH_SHORT).show());
             }
@@ -302,7 +302,7 @@ public class MainList extends AppCompatActivity {
     }
 
     private void createNewLight(String khuVuc, String lightName, String location) {
-        LightData newLightData = new LightData(lightName, 0, location, 1, 2000, 100, 5);
+        LightData newLightData = new LightData(lightName, 0, location, 1, 2000, 100, 5,"Empty");
         FirebaseDatabase.getInstance().getReference("LightStreet")
                 .child(khuVuc)
                 .child(lightName)

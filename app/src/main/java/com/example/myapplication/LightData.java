@@ -10,6 +10,7 @@ public class LightData {
     private int sensorLig;
     private int value;
 
+    private String assignedTo;
     private String lightname;
 
     // Default constructor required for calls to DataSnapshot.getValue(LightData.class)
@@ -17,7 +18,7 @@ public class LightData {
     }
 
 
-    public LightData(String lightname, int error, String location, int mode, int sensorEnv, int sensorLig, int value) {
+    public LightData(String lightname, int error, String location, int mode, int sensorEnv, int sensorLig, int value, String assignedTo) {
         this.lightname = lightname;
         this.error = error;
         this.location = location;
@@ -25,6 +26,7 @@ public class LightData {
         this.sensorEnv = sensorEnv;
         this.sensorLig = sensorLig;
         this.value = value;
+        this.assignedTo = assignedTo;
     }
 
     public String getLightName() {
@@ -82,6 +84,13 @@ public class LightData {
 
     public void setValue(int value) {
         this.value = value;
+    }
+    public String getAssignedTo() {
+        return assignedTo;
+    }
+
+    public void setAssignedTo(String assignedTo) {
+        this.assignedTo = assignedTo;
     }
     @Override
     public String toString() {
