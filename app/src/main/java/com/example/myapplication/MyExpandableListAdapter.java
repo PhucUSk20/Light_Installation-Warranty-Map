@@ -140,20 +140,22 @@ public class MyExpandableListAdapter extends BaseExpandableListAdapter {
         } else {
             convertView.setBackgroundColor(parent.getContext().getResources().getColor(android.R.color.background_light)); // Màu nền mặc định
         }
-        if (!Objects.equals(lightData.getAssignedTo(), "empty")) {
+        if (lightData.getAssignedTo() == null || lightData.getAssignedTo().isEmpty() || lightData.getAssignedTo().equals("empty")) {
+            imageView.setVisibility(View.GONE);
+            usernameTextView.setVisibility(View.GONE);
+        } else {
             imageView.setVisibility(View.VISIBLE);
             usernameTextView.setVisibility(View.VISIBLE);
             usernameTextView.setText(lightData.getAssignedTo());
+
             String imageUrl = lightData.getImageUrl();
             if (imageUrl != null && !imageUrl.isEmpty()) {
                 Picasso.get().load(imageUrl).into(imageView);
             } else {
                 Picasso.get().load(R.drawable.avatar_default).into(imageView);
             }
-        } else {
-            imageView.setVisibility(View.GONE);
-            usernameTextView.setVisibility(View.GONE);
         }
+
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
