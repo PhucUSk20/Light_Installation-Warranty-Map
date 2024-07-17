@@ -1,8 +1,12 @@
 package com.example.myapplication;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -62,10 +66,28 @@ public class HomeFragment extends Fragment {
 
         fab.setOnClickListener(v -> showCreateLightDialog());
 
+        checkLocationEnabled();
 
         return view;
     }
-
+    private void checkLocationEnabled() {
+        LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            // Định vị chưa được bật, hiển thị thông báo yêu cầu bật định vị
+            new AlertDialog.Builder(getContext())
+                    .setMessage("Bạn chưa bật định vị. Vui lòng bật định vị để sử dụng các tính năng liên quan đến vị trí.")
+                    .setPositiveButton("Bật định vị", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Chuyển đến cài đặt định vị của thiết bị
+                            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            startActivity(intent);
+                        }
+                    })
+                    .setNegativeButton("Không", null)
+                    .show();
+        }
+    }
 
     private void initializeData() {
         listGroupTitles = new ArrayList<>();
@@ -93,6 +115,29 @@ public class HomeFragment extends Fragment {
                                 List<LightData> lights = new ArrayList<>();
                                 for (DataSnapshot lightSnapshot : areaSnapshot.getChildren()) {
                                     LightData lightData = lightSnapshot.getValue(LightData.class);
+                                    String assignedTo = lightData.getAssignedTo();
+                                    if (assignedTo != null && !assignedTo.isEmpty()) {
+                                        FirebaseDatabase.getInstance().getReference("Users")
+                                                .orderByChild("username")
+                                                .equalTo(assignedTo)
+                                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot userSnapshot) {
+                                                        for (DataSnapshot dataSnapshot : userSnapshot.getChildren()) {
+                                                            String imageUrl = dataSnapshot.child("imageUrl").getValue(String.class);
+                                                            lightData.setImageUrl(imageUrl); // Set the imageUrl in LightData
+
+                                                            // Update the UI or adapter here if needed
+                                                            listAdapter.notifyDataSetChanged(); // Example: Notify adapter after updating LightData
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError error) {
+                                                        // Handle error if needed
+                                                    }
+                                                });
+                                    }
                                     lights.add(lightData);
                                 }
                                 listData.put(areaName, lights);
@@ -312,7 +357,7 @@ public class HomeFragment extends Fragment {
                 FirebaseDatabase.getInstance().getReference("LightStreet")
                         .child(newKhuvucName)
                         .child("Light1")
-                        .setValue(new LightData("Light1", 0, location, 1, 2000, 100, 5,"empty"))
+                        .setValue(new LightData("Light1", "0", location, 1, "2000", "100", "5","empty"))
                         .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "StreetLight created successfully", Toast.LENGTH_SHORT).show())
                         .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to create StreetLight", Toast.LENGTH_SHORT).show());
             }
@@ -325,7 +370,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void createNewLight(String khuVuc, String lightName, String location) {
-        LightData newLightData = new LightData(lightName, 0, location, 1, 2000, 100, 5,"empty");
+        LightData newLightData = new LightData(lightName, "0", location, 1, "2000", "100", "5","empty");
         FirebaseDatabase.getInstance().getReference("LightStreet")
                 .child(khuVuc)
                 .child(lightName)

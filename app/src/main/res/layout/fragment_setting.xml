@@ -22,6 +22,7 @@
 
             <ImageView
                 android:id="@+id/image_avatar"
+                android:src="@drawable/avatar_default"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
                 android:scaleType="centerCrop"

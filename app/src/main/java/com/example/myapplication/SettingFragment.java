@@ -123,7 +123,11 @@ public class SettingFragment extends Fragment {
                         // Set user info
                         textEmail.setText(email);
                         textName.setText(username);
-                        Picasso.get().load(imageUrl).into(imageAvatar);
+                        if (imageUrl != null && !imageUrl.isEmpty()) {
+                            Picasso.get().load(imageUrl).into(imageAvatar);
+                        } else {
+                            imageAvatar.setImageResource(R.drawable.avatar_default); // Set default avatar
+                        }
                     }
                 } else {
                     progressBar.setVisibility(View.GONE);

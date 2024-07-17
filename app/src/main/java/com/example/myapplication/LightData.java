@@ -3,26 +3,28 @@ package com.example.myapplication;
 import java.util.UUID;
 
 public class LightData {
-    private int error;
+    private String error;
     private String location;
-    private int mode;
-    private int sensorEnv;
-    private int sensorLig;
-    private int value;
+    private int Control;
+    private String sensorEnv;
+    private String sensorLig;
+    private String value;
 
     private String assignedTo;
     private String lightname;
+
+    private String imageUrl;
 
     // Default constructor required for calls to DataSnapshot.getValue(LightData.class)
     public LightData() {
     }
 
 
-    public LightData(String lightname, int error, String location, int mode, int sensorEnv, int sensorLig, int value, String assignedTo) {
+    public LightData(String lightname, String error, String location, int Control, String sensorEnv, String sensorLig, String value, String assignedTo) {
         this.lightname = lightname;
         this.error = error;
         this.location = location;
-        this.mode = mode;
+        this.Control  = Control;
         this.sensorEnv = sensorEnv;
         this.sensorLig = sensorLig;
         this.value = value;
@@ -38,11 +40,11 @@ public class LightData {
     }
 
     // Getters and setters for all fields
-    public int getError() {
+    public String getError() {
         return error;
     }
 
-    public void setError(int error) {
+    public void setError(String error) {
         this.error = error;
     }
 
@@ -55,34 +57,34 @@ public class LightData {
     }
 
     public int getMode() {
-        return mode;
+        return Control;
     }
 
-    public void setMode(int mode) {
-        this.mode = mode;
+    public void setMode(int Control) {
+        this.Control = Control;
     }
 
-    public int getSensorEnv() {
+    public String getSensorEnv() {
         return sensorEnv;
     }
 
-    public void setSensorEnv(int sensorEnv) {
+    public void setSensorEnv(String sensorEnv) {
         this.sensorEnv = sensorEnv;
     }
 
-    public int getSensorLig() {
+    public String getSensorLig() {
         return sensorLig;
     }
 
-    public void setSensorLig(int sensorLig) {
+    public void setSensorLig(String sensorLig) {
         this.sensorLig = sensorLig;
     }
 
-    public int getValue() {
+    public String getValue() {
         return value;
     }
 
-    public void setValue(int value) {
+    public void setValue(String value) {
         this.value = value;
     }
     public String getAssignedTo() {
@@ -96,4 +98,13 @@ public class LightData {
     public String toString() {
         return lightname;
     }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
 }

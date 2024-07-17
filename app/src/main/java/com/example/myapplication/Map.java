@@ -8,6 +8,7 @@ import static com.mapbox.navigation.base.extensions.RouteOptionsExtensions.apply
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -26,6 +27,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineCallback;
@@ -174,7 +176,6 @@ public class Map extends AppCompatActivity {
 
     private MapboxSpeechApi speechApi;
     private MapboxVoiceInstructionsPlayer mapboxVoiceInstructionsPlayer;
-
     private MapboxNavigationConsumer<Expected<SpeechError, SpeechValue>> speechCallback = new MapboxNavigationConsumer<Expected<SpeechError, SpeechValue>>() {
         @Override
         public void accept(Expected<SpeechError, SpeechValue> speechErrorSpeechValueExpected) {
@@ -376,7 +377,6 @@ public class Map extends AppCompatActivity {
                                             String khuVucLocation = locationSnapshot.getValue(String.class);
                                             Log.d("FirebaseLocation", "khuVucLocation: " + khuVucLocation);
 
-                                            // Tiếp tục xử lý ở đây, ví dụ:
                                             if (khuVucLocation != null) {
                                                 String lightId2 = khuVucLocation + "-" + lightSnapshot.getKey();
                                                 DatabaseReference warrantyRef = FirebaseDatabase.getInstance().getReference("Warranty");
@@ -386,27 +386,63 @@ public class Map extends AppCompatActivity {
                                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                         if (dataSnapshot.exists()) {
                                                             boolean found = false;
-
+                                                            String assignedTo = null;
+                                                            SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                                                            String username = sharedPreferences.getString("username", "");
                                                             for (DataSnapshot warrantySnapshot : dataSnapshot.getChildren()) {
                                                                 String lightId = warrantySnapshot.child("lightid").getValue(String.class);
-                                                                if (lightId != null && lightId.equals(lightId2)) {
+                                                                String assignedTo2 = warrantySnapshot.child("assignedTo").getValue(String.class);
+                                                                Log.d("FirebaseLocation", "assignedTo2: " + assignedTo2);
+                                                                Log.d("FirebaseLocation", "assignedTo: " + username);
+                                                                if (lightId != null && lightId.equals(lightId2) && assignedTo2.equals(username)) {
                                                                     Log.d("FirebaseLocation", "Found matching lightId in Warranty: " + lightId);
 
+                                                                    // Lấy giá trị của assignedTo từ warrantySnapshot
+                                                                    assignedTo = warrantySnapshot.child("assignedTo").getValue(String.class);
+
                                                                     warrantySnapshot.getRef().child("status").setValue("Complete");
-                                                                    lightSnapshot.getRef().child("error").setValue(0);
+                                                                    lightSnapshot.getRef().child("error").setValue("0");
+                                                                    lightSnapshot.getRef().child("assignedTo").setValue("empty");
                                                                     found = true;
                                                                     break; // Exit loop once found
                                                                 }
                                                             }
 
                                                             if (found) {
+                                                                if (assignedTo != null && !assignedTo.isEmpty()) {
+                                                                    DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Users");
+                                                                    Query query = usersRef.orderByChild("username").equalTo(assignedTo);
+                                                                    query.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                        @Override
+                                                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                                                            if (dataSnapshot.exists()) {
+                                                                                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                                                                                    Integer currentTaskComplete = userSnapshot.child("taskComplete").getValue(Integer.class);
+                                                                                    if (currentTaskComplete == null) {
+                                                                                        userSnapshot.getRef().child("taskComplete").setValue(1);
+                                                                                    } else {
+                                                                                        userSnapshot.getRef().child("taskComplete").setValue(currentTaskComplete + 1);
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+
+                                                                        @Override
+                                                                        public void onCancelled(DatabaseError databaseError) {
+                                                                            Log.e("FirebaseError", "DatabaseError: " + databaseError.getMessage());
+                                                                        }
+                                                                    });
+                                                                }
+
                                                                 Toast.makeText(Map.this, "Updated successfully", Toast.LENGTH_SHORT).show();
                                                                 Intent intent = new Intent(Map.this, MainActivity.class);
                                                                 startActivity(intent);
                                                                 finish();
+                                                            } else {
+                                                                Toast.makeText(Map.this, "No matching lightId found in Warranty", Toast.LENGTH_SHORT).show();
                                                             }
                                                         } else {
-                                                            Toast.makeText(Map.this, "No data found", Toast.LENGTH_SHORT).show();
+                                                            Toast.makeText(Map.this, "No data found in Warranty", Toast.LENGTH_SHORT).show();
                                                             Log.e("FirebaseLocation", "No data found in Firebase");
                                                         }
                                                     }
@@ -417,6 +453,9 @@ public class Map extends AppCompatActivity {
                                                         Log.e("FirebaseLocation", "Failed to update Firebase: " + databaseError.getMessage());
                                                     }
                                                 });
+                                            } else {
+                                                Toast.makeText(Map.this, "No data found for location", Toast.LENGTH_SHORT).show();
+                                                Log.e("FirebaseLocation", "No data found for location in Firebase");
                                             }
                                         } else {
                                             Toast.makeText(Map.this, "No data found for location", Toast.LENGTH_SHORT).show();
@@ -430,7 +469,6 @@ public class Map extends AppCompatActivity {
                                         Log.e("FirebaseLocation", "Failed to retrieve location: " + databaseError.getMessage());
                                     }
                                 });
-                                break;
                             }
                         }
                     }
